@@ -1,0 +1,5 @@
+1. Multivariate features with 1 time step in the past, predicting 1 time step into the future:
+Features used - Adj. Open, Adj High, Adj Low, Adj Close, Volume Traded
+Feature predicted - Adj closed
+Test RMSE: 0.032
+
