@@ -1,5 +1,14 @@
 1. Multivariate features with 1 time step in the past, predicting 1 time step into the future:
 Features used - Adj. Open, Adj High, Adj Low, Adj Close, Volume Traded
 Feature predicted - Adj closed
+epoch - 50, batch size - 70
 Test RMSE: 0.032
+
+2. Regression with single step (single feature) - loopback of 1: 
+Feature used and predicted - Adj. Closed
+Epochs - 100, batch size - 150
+Train Score RMSE: 0.28
+Test Score RMSE: 0.16
+
+3. 
 
