@@ -22,5 +22,12 @@ Epochs - 100, batch size - 150
 Train Score RMSE: 0.29
 Test Score RMSE: 0.13
 
+5. Regression with memory batches (single feature) - lookback of 3: 
+Feature used and predicted - Adj. Closed
+Epochs - 1, batch size -1 - loop of 100
+Train Score RMSE: 5.47
+Test Score RMSE: 0.15
+
+
 
 
