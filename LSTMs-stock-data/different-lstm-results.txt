@@ -28,6 +28,12 @@ Epochs - 1, batch size -1 - loop of 100
 Train Score RMSE: 5.47
 Test Score RMSE: 0.15
 
+6. Regression with stacked LSTM memory batches (single feature) - lookback of 3: 
+Feature used and predicted - Adj. Closed
+Epochs - 1, batch size -1 - loop of 100
+Train Score RMSE: 5.20
+Test Score RMSE: 0.04
+
 
 
 
