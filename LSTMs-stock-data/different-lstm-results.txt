@@ -10,5 +10,10 @@ Epochs - 100, batch size - 150
 Train Score RMSE: 0.28
 Test Score RMSE: 0.16
 
-3. 
+3. Regression with window (single feature) - loopback of 3: 
+Feature used and predicted - Adj. Closed
+Epochs - 100, batch size - 150
+Train Score RMSE: 0.32
+Test Score RMSE: 0.11
+
 
