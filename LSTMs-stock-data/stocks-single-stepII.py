@@ -138,6 +138,6 @@ rmse = sqrt(mean_squared_error(dataset[train_size:len(supervised_values),:], pre
 print('Test RMSE: %f' % rmse)
 #print(len(dataset[train_size:len(supervised_values),:]))
 # line plot of observed vs predicted
-pyplot.plot(dataset[train_size:len(supervised_values):])
-pyplot.plot(predictions)
-pyplot.show()
+pyplot.plot(dataset[train_size:len(supervised_values):]) #blue color is expected
+pyplot.plot(predictions) #orange color is predicted
+pyplot.show() #due to the low RMS error, they almost overlap fully on the test set
