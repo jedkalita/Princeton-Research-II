@@ -131,7 +131,7 @@ for i in range(len(test_scaled)):
     # store forecast
     predictions.append(yhat)
     expected = dataset[len(train) + i + 1]
-    print('Month=%d, Predicted=%f, Expected=%f' % (i + 1, yhat, expected))
+    print('Test Day=%d, Predicted=%f, Expected=%f' % (i + 1, yhat, expected))
 
 # report performance
 rmse = sqrt(mean_squared_error(dataset[train_size:len(supervised_values),:], predictions))
