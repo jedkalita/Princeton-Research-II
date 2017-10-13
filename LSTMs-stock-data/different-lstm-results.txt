@@ -34,12 +34,12 @@ Epochs - 1, batch size -1 - loop of 100
 Train Score RMSE: 5.20
 Test Score RMSE: 0.04
 
-7. Single step regression II (fit last model with no of epochs = 2, batch size = 1 for 
+7. Single step regression II (fit lstm model with no of epochs = 2, batch size = 1 for 
 9819 training samples, 4209 test samples)
 Feature used and predicted - Adj. Closed
 Test Score RMSE: 0.000176
 
-8. Multiple Time Steps (fit last model with no of epochs = 3, batch size = 1 for 
+8. Multiple Time Steps (fit lstm model with no of epochs = 3, batch size = 1 for 
 9819 training samples, 4209 test samples)
 Feature used and predicted - Adj. Closed
 Number of time steps into the future : 3
