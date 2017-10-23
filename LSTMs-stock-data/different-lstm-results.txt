@@ -36,8 +36,11 @@ Testing against persistence model 1 time step back (normalized): 0.013523
 5. Regression with memory batches (single feature) - lookback of 3: 
 Feature used and predicted - Adj. Closed
 Epochs - 1, batch size -1 - loop of 100
-Train Score RMSE: 5.47
-Test Score RMSE: 0.15
+Train Score (unnormalized): 12.964667 RMSE
+Train Score (normalized): 80.590745 RMSE
+Test Score (unnormalized): 8.370316 RMSE
+Test Score (normalized): 0.261828 RMSE
+Testing against persistence model 1 time step back (normalized): 0.013523
 
 6. Regression with stacked LSTM memory batches (single feature) - lookback of 3: 
 Feature used and predicted - Adj. Closed
