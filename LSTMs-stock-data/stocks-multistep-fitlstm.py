@@ -12,6 +12,14 @@ from math import sqrt
 from matplotlib import pyplot
 from numpy import array
 import pandas
+import math
+
+def my_mean_squared_error(inv_y, inv_yhat):
+    mse = 0
+    for i in range(len(inv_y)):
+        mse += float (math.pow((inv_y[i] - inv_yhat[i]), 2) / math.pow(inv_y[i], 2))
+    mse = mse / len(inv_y)
+    return mse
 
 # convert time series into supervised learning problem
 def series_to_supervised(data, n_in=1, n_out=1, dropnan=True):
@@ -134,7 +142,9 @@ def evaluate_forecasts(test, forecasts, n_lag, n_seq):
         actual = [row[i] for row in test]
         predicted = [forecast[i] for forecast in forecasts]
         rmse = sqrt(mean_squared_error(actual, predicted))
-        print('t+%d RMSE: %f' % ((i + 1), rmse))
+        rmse_normalized = sqrt(my_mean_squared_error(actual, predicted))
+        print('t+%d RMSE (unnormalized): %f' % ((i + 1), rmse))
+        print('t+%d RMSE (normalized): %f' % ((i + 1), rmse_normalized))
 
 
 # plot the forecasts in the context of the original dataset
@@ -153,6 +163,7 @@ def plot_forecasts(series, forecasts, n_test):
 
 # load the dataset
 dataframe = pandas.read_csv('EOD-KO.csv', usecols=[11], engine='python', skipfooter=3)
+dataframe = dataframe.reindex(index=dataframe.index[::-1])
 series = dataframe.values
 series = series.astype('float32')
 

@@ -63,9 +63,12 @@ Feature used and predicted - Adj. Closed
 Number of time steps into the future : 3
 Number of time steps from past : 1
 Test Score RMSE: 
-t+1 RMSE: 0.003229
-t+2 RMSE: 0.004785
-t+3 RMSE: 0.005907
+t+1 RMSE (unnormalized): 0.271322
+t+1 RMSE (normalized): 0.011913
+t+2 RMSE (unnormalized): 0.377552
+t+2 RMSE (normalized): 0.016630
+t+3 RMSE (unnormalized): 0.456384
+t+3 RMSE (normalized): 0.020180
 
 
 
