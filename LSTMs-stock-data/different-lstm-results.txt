@@ -54,7 +54,8 @@ Testing against persistence model (normalized): 0.013523
 7. Single step regression II (fit lstm model with no of epochs = 2, batch size = 1 for 
 9819 training samples, 4209 test samples)
 Feature used and predicted - Adj. Closed
-Test Score RMSE: 0.000176
+Test RMSE (unnormalized): 0.013872
+Test RMSE (normalized): 0.000675
 
 8. Multiple Time Steps (fit lstm model with no of epochs = 3, batch size = 1 for 
 9819 training samples, 4209 test samples)

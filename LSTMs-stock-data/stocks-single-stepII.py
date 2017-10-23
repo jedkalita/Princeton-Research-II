@@ -12,9 +12,17 @@ from math import sqrt
 from matplotlib import pyplot
 import numpy
 import pandas
+import math
 
 # fix random seed for reproducibility
 numpy.random.seed(7)
+
+def my_mean_squared_error(inv_y, inv_yhat):
+    mse = 0
+    for i in range(len(inv_y)):
+        mse += float (math.pow((inv_y[i] - inv_yhat[i]), 2) / math.pow(inv_y[i], 2))
+    mse = mse / len(inv_y)
+    return mse
 
 # frame a sequence as a supervised learning problem
 def timeseries_to_supervised(data, lag=1):
@@ -80,6 +88,7 @@ def forecast_lstm(model, batch_size, X):
 
 # load the dataset
 dataframe = pandas.read_csv('EOD-KO.csv', usecols=[11], engine='python', skipfooter=3)
+dataframe = dataframe.reindex(index=dataframe.index[::-1])
 dataset = dataframe.values
 dataset = dataset.astype('float32')
 #print(dataset)
@@ -120,6 +129,8 @@ lstm_model.predict(train_reshaped, batch_size=1)
 
 # walk-forward validation on the test data
 predictions = list()
+'''walk_for = list()
+history = [x for x in train[0]]'''
 for i in range(len(test_scaled)):
     # make one-step forecast
     X, y = test_scaled[i, 0:-1], test_scaled[i, -1]
@@ -131,11 +142,16 @@ for i in range(len(test_scaled)):
     # store forecast
     predictions.append(yhat)
     expected = dataset[len(train) + i + 1]
+    walk_for.append(expected)
     print('Test Day=%d, Predicted=%f, Expected=%f' % (i + 1, yhat, expected))
+
+
 
 # report performance
 rmse = sqrt(mean_squared_error(dataset[train_size:len(supervised_values),:], predictions))
-print('Test RMSE: %f' % rmse)
+print('Test RMSE (unnormalized): %f' % rmse)
+rmse_normalized = sqrt(my_mean_squared_error(dataset[train_size:len(supervised_values),:], predictions))
+print('Test RMSE (normalized): %f' % rmse_normalized)
 #print(len(dataset[train_size:len(supervised_values),:]))
 # line plot of observed vs predicted
 pyplot.plot(dataset[train_size:len(supervised_values):]) #blue color is expected
