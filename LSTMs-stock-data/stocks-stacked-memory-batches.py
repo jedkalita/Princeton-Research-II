@@ -8,6 +8,12 @@ from keras.layers import Dense
 from keras.layers import LSTM
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.metrics import mean_squared_error
+def my_mean_squared_error(inv_y, inv_yhat):
+    mse = 0
+    for i in range(len(inv_y)):
+        mse += float (math.pow((inv_y[i] - inv_yhat[i]), 2) / math.pow(inv_y[i], 2))
+    mse = mse / len(inv_y)
+    return mse
 # convert an array of values into a dataset matrix
 def create_dataset(dataset, look_back=1):
     dataX, dataY = [], []
@@ -20,6 +26,7 @@ def create_dataset(dataset, look_back=1):
 numpy.random.seed(7)
 # load the dataset
 dataframe = read_csv('EOD-KO.csv', usecols=[11], engine='python', skipfooter=3)
+dataframe = dataframe.reindex(index=dataframe.index[::-1])
 dataset = dataframe.values
 dataset = dataset.astype('float32')
 # normalize the dataset
@@ -43,7 +50,7 @@ model.add(LSTM(4, batch_input_shape=(batch_size, look_back, 1), stateful=True, r
 model.add(LSTM(4, batch_input_shape=(batch_size, look_back, 1), stateful=True))
 model.add(Dense(1))
 model.compile(loss='mean_squared_error', optimizer='adam')
-for i in range(100):
+for i in range(2):
     model.fit(trainX, trainY, epochs=1, batch_size=batch_size, verbose=2, shuffle=False)
     model.reset_states()
 # make predictions
@@ -55,11 +62,30 @@ trainPredict = scaler.inverse_transform(trainPredict)
 trainY = scaler.inverse_transform([trainY])
 testPredict = scaler.inverse_transform(testPredict)
 testY = scaler.inverse_transform([testY])
+print(trainY)
+print(testY)
+print(trainPredict)
+print(testPredict)
+
 # calculate root mean squared error
 trainScore = math.sqrt(mean_squared_error(trainY[0], trainPredict[:,0]))
-print('Train Score: %.2f RMSE' % (trainScore))
+trainScore_normalized = math.sqrt(my_mean_squared_error(trainY[0], trainPredict[:,0]))
+print('Train Score (unnormalized): %f RMSE' % (trainScore))
+print('Train Score (normalized): %f RMSE' % (trainScore_normalized))
 testScore = math.sqrt(mean_squared_error(testY[0], testPredict[:,0]))
-print('Test Score: %.2f RMSE' % (testScore))
+testScore_normalized = math.sqrt(my_mean_squared_error(testY[0], testPredict[:,0]))
+print('Test Score (unnormalized): %f RMSE' % (testScore))
+print('Test Score (normalized): %f RMSE' % (testScore_normalized))
+history = [x for x in trainY[0]]
+predictions = list()
+for i in range(len(testY[0])):
+    # make prediction
+    predictions.append(history[-1])
+    # observation
+    history.append(testY[0][i])
+print(predictions)
+persistence_rmse_normalized = math.sqrt(my_mean_squared_error(testY[0], predictions))
+print('Testing against persistence model (normalized): %f' % persistence_rmse_normalized)
 # shift train predictions for plotting
 trainPredictPlot = numpy.empty_like(dataset)
 trainPredictPlot[:, :] = numpy.nan
