@@ -14,6 +14,13 @@ from keras.models import Sequential
 from keras.layers import Dense
 from keras.layers import LSTM
 
+def my_mean_squared_error(inv_y, inv_yhat):
+    mse = 0
+    for i in range(len(inv_y)):
+        mse += float (math.pow((inv_y[i] - inv_yhat[i]), 2) / math.pow(inv_y[i], 2))
+    mse = mse / len(inv_y)
+    return mse
+
 # convert series to supervised learning
 def series_to_supervised(data, n_in=1, n_out=1, dropnan=True):
     n_vars = 1 if type(data) is list else data.shape[1]
@@ -41,15 +48,20 @@ def series_to_supervised(data, n_in=1, n_out=1, dropnan=True):
 
 # load dataset
 dataset = read_csv('EOD-KO.csv', header=0, index_col=0)
+dataset = dataset.reindex(index=dataset.index[::-1])
 #print(dataset)
+#print(type(dataset))
 values = dataset.values
 #print(values)
 '''encoder = LabelEncoder()
 values[:, 4] = encoder.fit_transform(values[:, 4])'''
-values = values[:, 7:12]
+values = values[:, 7:12] #until values, it seems to be on the right track
+#print(values)
+#values.reverse()
 #print(values.shape) #(14032, 5)
 # ensure all data is float
 values = values.astype('float32')
+#print(values)
 # normalize features
 scaler = MinMaxScaler(feature_range=(0, 1))
 scaled = scaler.fit_transform(values)
@@ -61,23 +73,38 @@ reframed = series_to_supervised(scaled, 1, 1)
 #print(reframed)
 # drop columns we don't want to predict
 #reframed.drop(reframed.columns[[0, 1, 2, 3, 4, 5, 6, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 23]], axis=1, inplace=True)
-reframed.drop(reframed.columns[[5, 6, 7, 9]], axis=1, inplace=True)
+reframed.drop(reframed.columns[[5, 6, 7, 9]], axis=1, inplace=True) #now it is scaled between (0, 1)
 print(reframed.head())
+print(reframed.tail())
 #var8 - adj open, var9 - adj high, var10 - adj low, var11 - adj close, var12 - volume traded
 #we are predicting adj close here (hence column 8 is saved)
 
 # split into train and test sets
 values = reframed.values
+
 #print(values)
 n_train = math.ceil(len(values) * 0.7)
 print("No of training examples = %d" %n_train)
 n_test = len(values) - n_train
 print("No of test examples = %d" %n_test)
 train = values[:n_train, :]
+print(train)
 test = values[n_train:, :]
+print(test)
 # split into input and outputs
 train_X, train_y = train[:, :-1], train[:, -1]
 test_X, test_y = test[:, :-1], test[:, -1]
+#print("Printing test_y")
+history = [x for x in train_y]
+predictions = list()
+for i in range(len(test_y)):
+    # make prediction
+    predictions.append(history[-1])
+    # observation
+    history.append(test_y[i])
+
+persistence_rmse_normalized = sqrt(my_mean_squared_error(test_y, predictions))
+
 # reshape input to be 3D [samples, timesteps, features]
 train_X = train_X.reshape((train_X.shape[0], 1, train_X.shape[1]))
 test_X = test_X.reshape((test_X.shape[0], 1, test_X.shape[1]))
@@ -99,7 +126,8 @@ pyplot.legend()
 pyplot.show()
 
 # make a prediction
-yhat = model.predict(test_X)
+yhat = model.predict(test_X) #it will return adj close in scaled format - the predicted version
+print(yhat)
 #print(yhat.shape) #(4209, 1)
 test_X = test_X.reshape((test_X.shape[0], test_X.shape[2]))
 #print(test_X.shape) #(4209, 5)
@@ -110,11 +138,24 @@ inv_yhat = concatenate((yhat, test_X[:, 1:]), axis=1)
 inv_yhat = scaler.inverse_transform(inv_yhat) #initially when the scaler is called on values, the values
 #has to be of the proper dimensions in terms of the number of features
 inv_yhat = inv_yhat[:,0]
+print(inv_yhat)
 # invert scaling for actual
 test_y = test_y.reshape((len(test_y), 1))
 inv_y = concatenate((test_y, test_X[:, 1:]), axis=1)
 inv_y = scaler.inverse_transform(inv_y)
 inv_y = inv_y[:,0]
 # calculate RMSE
-rmse = sqrt(mean_squared_error(inv_y, inv_yhat))
-print('Test RMSE: %.3f' % rmse)
+print(inv_y)
+print(len(inv_y))
+print(inv_yhat)
+print(len(inv_yhat))
+rmse_unnormalized = sqrt(mean_squared_error(inv_y, inv_yhat))
+
+
+
+rmse = sqrt(my_mean_squared_error(inv_y, inv_yhat))
+print('Test RMSE (normalized): %f' % rmse)
+print('Test RMSE (unnormalized): %f' % rmse_unnormalized)
+
+
+print('Testing against persistence model (normalized): %f' % persistence_rmse_normalized)
