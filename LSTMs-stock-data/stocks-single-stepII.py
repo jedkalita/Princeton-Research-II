@@ -90,6 +90,7 @@ def forecast_lstm(model, batch_size, X):
 dataframe = pandas.read_csv('EOD-KO.csv', usecols=[11], engine='python', skipfooter=3)
 dataframe = dataframe.reindex(index=dataframe.index[::-1])
 dataset = dataframe.values
+#series = dataset
 dataset = dataset.astype('float32')
 #print(dataset)
 
@@ -120,6 +121,9 @@ train, test = supervised_values[0:train_size,:], supervised_values[train_size:le
 # transform the scale of the data
 scaler, train_scaled, test_scaled = scale(train, test)
 
+
+
+
 # fit the model
 lstm_model = fit_lstm(train_scaled, 1, 2, 4)
 
@@ -127,10 +131,9 @@ lstm_model = fit_lstm(train_scaled, 1, 2, 4)
 train_reshaped = train_scaled[:, 0].reshape(len(train_scaled), 1, 1)
 lstm_model.predict(train_reshaped, batch_size=1)
 
-# walk-forward validation on the test data
+
 predictions = list()
-'''walk_for = list()
-history = [x for x in train[0]]'''
+
 for i in range(len(test_scaled)):
     # make one-step forecast
     X, y = test_scaled[i, 0:-1], test_scaled[i, -1]
@@ -142,16 +145,48 @@ for i in range(len(test_scaled)):
     # store forecast
     predictions.append(yhat)
     expected = dataset[len(train) + i + 1]
-    walk_for.append(expected)
+    #walk_for.append(expected)
     print('Test Day=%d, Predicted=%f, Expected=%f' % (i + 1, yhat, expected))
 
+# walk-forward validation on the test data
+walk_for = list()
+history = [x for x in dataset[0:train_size]]
+for i in range(len(test)):
+    # make prediction
+    walk_for.append(history[-1])
+    # observation
+    history.append(dataset[train_size + i])
 
+for i in range(len(walk_for)):
+    print('Test #=%d, Persistence Model value=%f, Predicted model value=%f' %(i, walk_for[i][0], predictions[i][0]))
+
+'''print(len(walk_for)) #4209
+print(walk_for)'''
+print(walk_for)
+print(predictions)
 
 # report performance
 rmse = sqrt(mean_squared_error(dataset[train_size:len(supervised_values),:], predictions))
 print('Test RMSE (unnormalized): %f' % rmse)
 rmse_normalized = sqrt(my_mean_squared_error(dataset[train_size:len(supervised_values),:], predictions))
 print('Test RMSE (normalized): %f' % rmse_normalized)
+
+rmse_persistence_unnormalized = sqrt(mean_squared_error(dataset[train_size:len(supervised_values),:], walk_for))
+print('Persistence Model RMSE against test set (unnormalized): %f' % rmse_persistence_unnormalized)
+rmse_persistence_normalized = sqrt(my_mean_squared_error(dataset[train_size:len(supervised_values),:], walk_for))
+print('Persistence Model RMSE against test set (normalized): %f' % rmse_persistence_normalized)
+
+'''walk_for2 = list()
+for i in range(train_size):
+    # make prediction
+    walk_for2.append(dataset[i + 1])
+    # observation
+
+rmse_testing_persistence_unnormalized = sqrt(mean_squared_error(dataset[0:train_size:], walk_for2))
+print('Persistence Model RMSE against training set (unnormalized): %f' % rmse_testing_persistence_unnormalized)
+rmse_testing_persistence_normalized = sqrt(my_mean_squared_error(dataset[0:train_size], walk_for2))
+print('Persistence Model RMSE against training set (normalized): %f' % rmse_testing_persistence_normalized)'''
+
 #print(len(dataset[train_size:len(supervised_values),:]))
 # line plot of observed vs predicted
 pyplot.plot(dataset[train_size:len(supervised_values):]) #blue color is expected
