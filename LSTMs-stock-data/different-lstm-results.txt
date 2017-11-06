@@ -1,11 +1,6 @@
 1. Multivariate features with 1 time step in the past, predicting 1 time step into the future:
 Features used - Adj. Open, Adj High, Adj Low, Adj Close, Volume Traded
 Feature predicted - Adj closed
-epoch - 50, batch size - 70
-Test RMSE (normalized): 0.141225
-Test RMSE (unnormalized): 5.135277
-Testing against persistence model 1 time step back (normalized): 0.011938
-
 New results- (epoch - 50, batch size - 140, no of repeats - 10
 Test RMSE (normalized): 0.034445
 Test RMSE (unnormalized): 1.160774
