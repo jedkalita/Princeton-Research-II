@@ -6,6 +6,14 @@ Test RMSE (normalized): 0.141225
 Test RMSE (unnormalized): 5.135277
 Testing against persistence model 1 time step back (normalized): 0.011938
 
+New results- (epoch - 50, batch size - 140, no of repeats - 10
+Test RMSE (normalized): 0.034445
+Test RMSE (unnormalized): 1.160774
+Testing against persistence model (normalized): 0.011938
+Testing against persistence model for training (unnormalized): 0.002959
+
+
+
 2. Regression with single step (single feature) - loopback of 1: 
 Feature used and predicted - Adj. Closed
 Epochs - 100, batch size - 150

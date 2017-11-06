@@ -84,6 +84,7 @@ values = reframed.values
 
 #print(values)
 n_train = math.ceil(len(values) * 0.7)
+#n_train = n_train - 22
 print("No of training examples = %d" %n_train)
 n_test = len(values) - n_train
 print("No of test examples = %d" %n_test)
@@ -112,18 +113,26 @@ print(train_X.shape, train_y.shape, test_X.shape, test_y.shape)
 
 # design network
 model = Sequential()
-model.add(LSTM(50, input_shape=(train_X.shape[1], train_X.shape[2])))
+'''model.add(LSTM(2, input_shape=(train_X.shape[1], train_X.shape[2]), return_sequences=True))
+model.add(LSTM(2, input_shape=(train_X.shape[1], train_X.shape[2]), return_sequences=True))
+model.add(LSTM(2, input_shape=(train_X.shape[1], train_X.shape[2]), return_sequences=True))'''
+model.add(LSTM(12, input_shape=(train_X.shape[1], train_X.shape[2])))
+'''batch = 1
+model.add(LSTM(2, batch_input_shape=(batch, train_X.shape[1], train_X.shape[2]), stateful=True))'''
 model.add(Dense(1))
 model.compile(loss='mae', optimizer='adam')
 # fit network
-batch = math.floor(n_train / 50)
-history = model.fit(train_X, train_y, epochs=50, batch_size=70, validation_data=(test_X, test_y), verbose=2,
-					shuffle=False)
-# plot history
-pyplot.plot(history.history['loss'], label='train')
-pyplot.plot(history.history['val_loss'], label='test')
-pyplot.legend()
-pyplot.show()
+#batch = math.floor(n_train / 50)
+repeats = 10
+for i in range(repeats):
+    print("Repeat #: %d" %i)
+    history = model.fit(train_X, train_y, epochs=100, batch_size=140, validation_data=(test_X, test_y), verbose=2, shuffle=False)
+
+'''nb_epochs = 5
+for i in range(nb_epochs):
+    history = model.fit(train_X, train_y, epochs=1, batch_size=batch, validation_data=(test_X, test_y), verbose=2, shuffle=False)
+    model.reset_states()'''
+
 
 # make a prediction
 yhat = model.predict(test_X) #it will return adj close in scaled format - the predicted version
@@ -159,3 +168,22 @@ print('Test RMSE (unnormalized): %f' % rmse_unnormalized)
 
 
 print('Testing against persistence model (normalized): %f' % persistence_rmse_normalized)
+
+predictions2 = list()
+for i in range(len(train_y) - 1):
+    # make prediction
+    predictions2.append(train_y[i + 1])
+    # observation
+    #history.append(trainY[0][i])
+predictions2.append(test_y[1])
+
+'''persistence_rmse_normalized2 = math.sqrt(my_mean_squared_error(train_y, predictions2))
+print('Testing against persistence model for training (normalized): %f' % persistence_rmse_normalized2)'''
+persistence_rmse2 = math.sqrt(mean_squared_error(train_y, predictions2))
+print('Testing against persistence model for training (unnormalized): %f' % persistence_rmse2)
+
+# plot history
+pyplot.plot(history.history['loss'], label='train')
+pyplot.plot(history.history['val_loss'], label='test')
+pyplot.legend()
+pyplot.show()
