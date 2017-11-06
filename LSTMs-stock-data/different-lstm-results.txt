@@ -9,11 +9,14 @@ Testing against persistence model 1 time step back (normalized): 0.011938
 2. Regression with single step (single feature) - loopback of 1: 
 Feature used and predicted - Adj. Closed
 Epochs - 100, batch size - 150
-Train Score (unnormalized): 0.110885 RMSE
-Train Score (normalized): 0.148102 RMSE
-Test Score (unnormalized): 1.241973 RMSE
-Test Score (normalized): 0.033336 RMSE
-Testing against persistence model 1 time step back (normalized): 0.013517
+Train Score (unnormalized): 0.114818 RMSE
+Train Score (normalized): 0.025329 RMSE
+Test Score (unnormalized): 0.316798 RMSE
+Test Score (normalized): 0.015084 RMSE
+Testing against persistence model (normalized): 0.013517
+Testing against persistence model (unnormalized): 0.289271
+Testing against persistence model for training (normalized): 0.015251
+Testing against persistence model for training (unnormalized): 0.106953
 
 3. Regression with window (3 features) - lookback of 3: 
 Feature used and predicted - Adj. Closed
