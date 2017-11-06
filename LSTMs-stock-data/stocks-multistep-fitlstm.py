@@ -167,16 +167,27 @@ dataframe = dataframe.reindex(index=dataframe.index[::-1])
 series = dataframe.values
 series = series.astype('float32')
 
+#print(len(series))
+
 # configure
 n_lag = 1
 n_seq = 3
 n_test = 4209
 n_epochs = 3
 n_batch = 1
-n_neurons = 4
+n_neurons = 10
 
 # prepare data
 scaler, train, test = prepare_data(series, n_test, n_lag, n_seq)
+train_size = len(train)
+test_size = len(test)
+series_size = train_size + test_size
+'''print(train_size)
+print(len(series))
+print(n_test)
+print(len(test))'''
+'''print(test)
+print(train)'''
 
 # fit model
 model = fit_lstm(train, n_lag, n_seq, n_batch, n_epochs, n_neurons)
@@ -189,9 +200,74 @@ forecasts = inverse_transform(series, forecasts, scaler, n_test+2)
 actual = [row[n_lag:] for row in test]
 actual = inverse_transform(series, actual, scaler, n_test+2)
 
+'''print(actual)
+print(forecasts)'''
 # evaluate forecasts
 evaluate_forecasts(actual, forecasts, n_lag, n_seq)
 
+# walk-forward validations on the test data
+walk_for_1 = list()
+walk_for_2 = list()
+walk_for_3 = list()
+history = [x for x in series[0:train_size]]
+for i in range(len(test)):
+    # make prediction
+    walk_for_1.append(history[-1])
+    walk_for_2.append(history[-2])
+    walk_for_3.append(history[-3])
+    # observation
+    history.append(series[train_size + i])
+
+rmse_persistence_unnormalized_1 = sqrt(mean_squared_error(series[train_size:series_size,:], walk_for_1))
+print('Persistence Model (forecast 1) RMSE against test set (unnormalized): %f' % rmse_persistence_unnormalized_1)
+rmse_persistence_normalized_1 = sqrt(my_mean_squared_error(series[train_size:series_size,:], walk_for_1))
+print('Persistence Model (forecast 1) RMSE against test set (normalized): %f' % rmse_persistence_normalized_1)
+
+rmse_persistence_unnormalized_2 = sqrt(mean_squared_error(series[train_size:series_size,:], walk_for_2))
+print('Persistence Model (forecast 2) RMSE against test set (unnormalized): %f' % rmse_persistence_unnormalized_2)
+rmse_persistence_normalized_2 = sqrt(my_mean_squared_error(series[train_size:series_size,:], walk_for_2))
+print('Persistence Model (forecast 2) RMSE against test set (normalized): %f' % rmse_persistence_normalized_2)
+
+rmse_persistence_unnormalized_3 = sqrt(mean_squared_error(series[train_size:series_size,:], walk_for_3))
+print('Persistence Model (forecast 3) RMSE against test set (unnormalized): %f' % rmse_persistence_unnormalized_3)
+rmse_persistence_normalized_3 = sqrt(my_mean_squared_error(series[train_size:series_size,:], walk_for_3))
+print('Persistence Model (forecast 3) RMSE against test set (normalized): %f' % rmse_persistence_normalized_3)
+
+
+'''# make a persistence forecast
+def persistence(last_ob, n_seq):
+    return [last_ob for i in range(n_seq)]
+
+
+# evaluate the persistence model
+def make_forecasts_persistence(train, test, n_lag, n_seq):
+    forecasts = list()
+    for i in range(len(test)):
+        X, y = test[i, 0:n_lag], test[i, n_lag:]
+        # make forecast
+        forecast = persistence(X[-1], n_seq)
+        # store the forecast
+        forecasts.append(forecast)
+    return forecasts
+
+
+# evaluate the RMSE for each forecast time step
+def evaluate_forecasts_persistence(test, forecasts, n_lag, n_seq):
+    for i in range(n_seq):
+        actual = test[:, (n_lag + i)]
+        predicted = [forecast[i] for forecast in forecasts]
+        rmse = sqrt(mean_squared_error(actual, predicted))
+        print('Persistence t+%d RMSE: %f' % ((i + 1), rmse))
+
+# make forecasts for persistence model
+forecasts_persistence = make_forecasts_persistence(train, test, n_lag, n_seq)
+# evaluate forecasts for persistence model
+print("..........PERSISTENCE MODEL RESULTS............")
+evaluate_forecasts_persistence(test, forecasts, n_lag, n_seq)'''
+
 # plot forecasts
+# plot forecasts for lstm model
 plot_forecasts(series, forecasts, n_test+2)
+# plot forecasts for persistence model
+#plot_forecasts(series, forecasts_persistence, n_test+2)
 
