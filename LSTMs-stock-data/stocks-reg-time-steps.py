@@ -50,10 +50,10 @@ testX = numpy.reshape(testX, (testX.shape[0], testX.shape[1], 1))
 #print(testX.shape) #(4626, 3, 1)
 # create and fit the LSTM network
 model = Sequential()
-model.add(LSTM(4, input_shape=(look_back, 1)))
+model.add(LSTM(400, input_shape=(look_back, 1)))
 model.add(Dense(1))
 model.compile(loss='mean_squared_error', optimizer='adam')
-model.fit(trainX, trainY, epochs=100, batch_size=150, verbose=2)
+model.fit(trainX, trainY, epochs=100, batch_size=20, validation_data=(testX, testY), verbose=2)
 # make predictions
 trainPredict = model.predict(trainX)
 testPredict = model.predict(testX)
@@ -89,6 +89,19 @@ print(predictions)
 
 persistence_rmse_normalized = math.sqrt(my_mean_squared_error(testY[0], predictions))
 print('Testing against persistence model (normalized): %f' % persistence_rmse_normalized)
+predictions2 = list()
+for i in range(len(trainY[0]) - 1):
+    # make prediction
+    predictions2.append(trainY[0][i + 1])
+    # observation
+    #history.append(trainY[0][i])
+predictions2.append(testY[0][1])
+
+persistence_rmse_normalized2 = math.sqrt(my_mean_squared_error(trainY[0], predictions2))
+print('Testing against persistence model for training (normalized): %f' % persistence_rmse_normalized2)
+persistence_rmse2 = math.sqrt(mean_squared_error(trainY[0], predictions2))
+print('Testing against persistence model for training (unnormalized): %f' % persistence_rmse2)
+
 
 # shift train predictions for plotting
 trainPredictPlot = numpy.empty_like(dataset)
